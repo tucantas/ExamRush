@@ -4,9 +4,9 @@ Versión inicial del proyecto, creada desde cero a partir de las tareas del tabl
 
 ## Qué incluye
 
-- **Web:** `index.html`, `register.html`, `login.html`, `tienda.html`, `perfil.html` y `ranking.html`. Son páginas separadas, sencillas y sin CSS. La tienda consulta la API y permite comprar y devolver objetos; el perfil muestra inventario e historial.
+- **Web:** páginas fuente separadas en `public/`, sencillas y sin CSS. Maven las sirve desde el backend. La tienda consulta la API y permite comprar y devolver objetos; el perfil muestra inventario e historial.
 - **Android:** registro, login, catálogo, compra, devolución, partida y ranking.
-- **Partida:** juego 2D sencillo. El jugador se mueve tocando la pantalla, recoge libros y evita distracciones. Cada libro suma 10 puntos; cada distracción resta 5. Al terminar se guarda la puntuación y aparece una nota orientativa.
+- **Partida:** juego 2D sencillo. El jugador se mueve tocando la pantalla, recoge libros y evita distracciones (un móvil). Cada libro suma 10 puntos; la distracción resta 5. Al terminar se guarda puntuación y duración y aparece una nota orientativa.
 - **API:** Spring Boot con rutas REST, validación, respuestas JSON de error y Swagger UI.
 - **Base de datos:** H2 relacional en archivo local, con las tablas `jugador`, `partida`, `objeto` e `inventario`.
 - **Pruebas:** recorrido HTTP integrado para registro, login, catálogo, compra, devolución, partida, ranking, errores y Swagger.
@@ -54,7 +54,6 @@ El grupo debe confirmar el saldo, el catálogo y la regla de nota antes de prese
 
 Es una demo académica: las contraseñas se guardan cifradas, pero el login no crea tokens y las peticiones de tienda identifican al jugador mediante su ID. No está preparada para publicar en Internet como servicio real. El H2 console y HTTP sin cifrar están activados para desarrollo local.
 
-## GitHub Actions
+## Integración y reparto
 
-Los flujos de `.github/workflows` ejecutan las pruebas del backend y compilan la app Android en cada cambio.
-
+Los flujos de `.github/workflows` para ejecutar las pruebas y compilar Android están preparados en el paquete de pruebas/integración. La división sugerida para que cada integrante haga su propio commit está en `CONTRIBUTIONS.md`.
