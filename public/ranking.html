@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="es">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Ranking</title></head>
+<body>
+  <h1>Ranking</h1>
+  <p><a href="index.html">Inicio</a> | <a href="tienda.html">Tienda</a></p>
+  <button id="cargar" type="button">Actualizar ranking</button>
+  <ol id="resultados"></ol>
+  <p id="mensaje" role="status"></p>
+  <script>
+    document.querySelector('#cargar').addEventListener('click', async () => {
+      const message = document.querySelector('#mensaje');
+      try {
+        const response = await fetch('/api/v1/ranking?limite=10'); const data = await response.json();
+        if (!response.ok) throw new Error(data.mensaje || 'No se pudo cargar el ranking.');
+        const list = document.querySelector('#resultados'); list.replaceChildren();
+        for (const row of data) { const li = document.createElement('li'); li.textContent = `${row.nombre}: ${row.puntuacion} puntos`; list.append(li); }
+        message.textContent = data.length ? '' : 'Aún no hay partidas guardadas.';
+      } catch (error) { message.textContent = error.message; }
+    });
+    document.querySelector('#cargar').click();
+  </script>
+</body>
+</html>

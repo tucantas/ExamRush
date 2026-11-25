@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="es">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Tienda</title></head>
+<body>
+  <h1>Tienda</h1>
+  <p id="jugador">Inicia sesión para comprar objetos.</p>
+  <p><a href="index.html">Inicio</a> | <a href="login.html">Login</a> | <a href="register.html">Registro</a> | <a href="perfil.html">Mi perfil e historial</a> | <a href="ranking.html">Ranking</a></p>
+  <h2>Objetos disponibles</h2>
+  <button id="recargar" type="button">Cargar objetos</button>
+  <table border="1"><thead><tr><th>ID</th><th>Objeto</th><th>Descripción</th><th>Precio</th><th>Existencias</th><th>Acción</th></tr></thead><tbody id="objetos"></tbody></table>
+  <h2>Comprar</h2><p>Usa el botón de cada objeto para comprar una unidad.</p>
+  <h2>Mi inventario</h2><ul id="inventario"></ul>
+  <p id="mensaje" role="status"></p>
+  <script>
+    const player = JSON.parse(sessionStorage.getItem('jugador') || 'null');
+    const notice = document.querySelector('#mensaje');
+    if (player) document.querySelector('#jugador').textContent = `Jugador: ${player.nombre} · Saldo: ${player.saldo}`;
+    async function request(url, options = {}) {
+      const response = await fetch(url, options);
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.mensaje || 'La solicitud ha fallado.');
+      return data;
+    }
+    async function loadStore() {
+      try {
+        const items = await request('/api/v1/tienda/objetos');
+        const body = document.querySelector('#objetos'); body.replaceChildren();
+        for (const item of items) {
+          const row = document.createElement('tr');
+          for (const value of [item.id, item.nombre, item.descripcion || '', item.precio, item.existencias]) {
+            const cell = document.createElement('td'); cell.textContent = value; row.append(cell);
+          }
+          const actions = document.createElement('td');
+          const buy = document.createElement('button'); buy.type = 'button'; buy.textContent = 'Comprar 1';
+          buy.disabled = !player || item.existencias < 1;
+          buy.addEventListener('click', () => movement(item.id, false)); actions.append(buy); row.append(actions);
+          body.append(row);
+        }
+        if (player) await loadInventory();
+      } catch (error) { notice.textContent = error.message; }
+    }
+    async function loadInventory() {
+      const items = await request(`/api/v1/jugadores/${player.id}/inventario`);
+      const list = document.querySelector('#inventario'); list.replaceChildren();
+      for (const item of items) {
+        const li = document.createElement('li'); li.append(document.createTextNode(`${item.nombreObjeto}: ${item.cantidad} `));
+        const refund = document.createElement('button'); refund.type = 'button'; refund.textContent = 'Devolver 1';
+        refund.addEventListener('click', () => movement(item.objetoId, true)); li.append(refund); list.append(li);
+      }
+    }
+    async function movement(objetoId, devolver) {
+      if (!player) { notice.textContent = 'Inicia sesión antes de realizar esta operación.'; return; }
+      try {
+        const route = devolver ? '/api/v1/tienda/devoluciones' : '/api/v1/tienda/compras';
+        const result = await request(route, { method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ jugadorId: player.id, objetoId: Number(objetoId), cantidad: 1 }) });
+        Object.assign(player, result.jugador); sessionStorage.setItem('jugador', JSON.stringify(player));
+        document.querySelector('#jugador').textContent = `Jugador: ${player.nombre} · Saldo: ${player.saldo}`;
+        notice.textContent = result.mensaje; await loadStore();
+      } catch (error) { notice.textContent = error.message; }
+    }
+    document.querySelector('#recargar').addEventListener('click', loadStore);
+    loadStore();
+  </script>
+</body>
+</html>
