@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="es">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Login</title></head>
+<body>
+  <h1>Login</h1>
+  <form id="login">
+    <p><label>Email<br><input name="email" type="email" required></label></p>
+    <p><label>Contraseña<br><input name="password" type="password" required></label></p>
+    <button type="submit">Entrar</button>
+  </form>
+  <p id="mensaje" role="status"></p>
+  <p><a href="register.html">Registro</a> | <a href="tienda.html">Tienda</a> | <a href="perfil.html">Mi perfil e historial</a> | <a href="index.html">Inicio</a></p>
+  <script>
+    document.querySelector('#login').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const datos = Object.fromEntries(new FormData(event.currentTarget));
+      const salida = document.querySelector('#mensaje');
+      try {
+        const respuesta = await fetch('/api/v1/usuarios/login', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(datos)
+        });
+        const cuerpo = await respuesta.json();
+        if (!respuesta.ok) throw new Error(cuerpo.mensaje || 'No se pudo iniciar sesión.');
+        sessionStorage.setItem('jugador', JSON.stringify(cuerpo));
+        location.href = 'tienda.html';
+      } catch (error) { salida.textContent = error.message || 'No se pudo conectar con la API.'; }
+    });
+  </script>
+</body>
+</html>
