@@ -20,4 +20,4 @@ jobs:
         with:
           gradle-version: '8.7'
       - name: Compilar aplicación Android
-        run: gradle -p android :app:assembleDebug
+        run: gradle :app:assembleDebug
