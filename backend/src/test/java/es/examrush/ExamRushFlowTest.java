@@ -66,7 +66,7 @@ class ExamRushFlowTest {
                 .andExpect(status().isOk()).andExpect(jsonPath("$", hasSize(0)));
 
         mvc.perform(post("/api/v1/partidas").contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"jugadorId\":" + jugadorId + ",\"puntuacion\":850}"))
+                        .content("{\"jugadorId\":" + jugadorId + ",\"puntuacion\":850,\"duracionSegundos\":45}"))
                 .andExpect(status().isCreated()).andExpect(jsonPath("$.puntuacion").value(850))
                 .andExpect(jsonPath("$.notaExamen").value(10.0));
         mvc.perform(get("/api/v1/ranking?limite=10"))
