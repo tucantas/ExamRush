@@ -42,17 +42,17 @@ class ExamRushFlowTest {
                                 {"nombre":"Alex","email":"alex@example.com","password":"exam1234"}
                                 """))
                 .andExpect(status().isCreated()).andExpect(jsonPath("$.saldo").value(100.0)).andReturn();
-        long jugadorId = JsonPath.read(registro.getResponse().getContentAsString(), "$.id");
+        long jugadorId = ((Number) JsonPath.read(registro.getResponse().getContentAsString(), "$.id")).longValue();
 
         mvc.perform(post("/api/v1/usuarios/login").contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {"email":"alex@example.com","password":"exam1234"}
                                 """))
-                .andExpect(status().isOk()).andExpect(jsonPath("$.id").value(jugadorId));
+                .andExpect(status().isOk()).andExpect(jsonPath("$.id").value((int) jugadorId));
 
         MvcResult catalogo = mvc.perform(get("/api/v1/tienda/objetos"))
                 .andExpect(status().isOk()).andExpect(jsonPath("$", hasSize(1))).andReturn();
-        long objetoId = JsonPath.read(catalogo.getResponse().getContentAsString(), "$[0].id");
+        long objetoId = ((Number) JsonPath.read(catalogo.getResponse().getContentAsString(), "$[0].id")).longValue();
         String movimiento = "{\"jugadorId\":" + jugadorId + ",\"objetoId\":" + objetoId + ",\"cantidad\":1}";
 
         mvc.perform(post("/api/v1/tienda/compras").contentType(MediaType.APPLICATION_JSON).content(movimiento))
@@ -102,7 +102,7 @@ class ExamRushFlowTest {
 
     @Test
     void paginasWebSeSirvenDesdeElProyecto() throws Exception {
-        mvc.perform(get("/")).andExpect(status().isOk()).andExpect(content().string(org.hamcrest.Matchers.containsString("Exam Rush")));
+        mvc.perform(get("/index.html")).andExpect(status().isOk()).andExpect(content().string(org.hamcrest.Matchers.containsString("Exam Rush")));
         mvc.perform(get("/register.html")).andExpect(status().isOk());
         mvc.perform(get("/login.html")).andExpect(status().isOk());
         mvc.perform(get("/tienda.html")).andExpect(status().isOk());
