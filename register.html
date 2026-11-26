@@ -23,7 +23,7 @@
         const cuerpo = await respuesta.json();
         if (!respuesta.ok) throw new Error(cuerpo.mensaje || 'No se pudo crear la cuenta.');
         salida.textContent = `Cuenta creada para ${cuerpo.nombre}. Ya puedes iniciar sesión.`;
-        event.currentTarget.reset();
+        event.target.reset();
       } catch (error) { salida.textContent = error.message || 'No se pudo conectar con la API.'; }
     });
   </script>
